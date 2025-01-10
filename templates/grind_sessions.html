@@ -69,7 +69,7 @@
                         <tr>
                             <td>{{ session.subject.name }}</td>
                             <td>{{ session.date.strftime('%Y-%m-%d') }}</td>
-                            <td>${{ session.price }}</td>
+                            <td>€{{ session.price }}</td>
                             <td>
                                 <ul>
                                     {% for student in session.students %}
