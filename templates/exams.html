@@ -1,0 +1,120 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container mt-5">
+    <div class="row">
+        <!-- Exam List Section -->
+        <div class="col-md-7">
+            <h1 class="mb-4">All Exams</h1>
+            <table class="table table-hover table-bordered shadow-sm">
+                <thead class="table-dark">
+                    <tr>
+                        <th>Exam Title</th>
+                        <th>Class</th>
+                        <th>Exam Date</th>
+                        <th>Status</th>
+                        <th>PDF</th>
+                        <th>Actions</th>  <!-- Single column for Edit and Delete buttons -->
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for exam, class_name in exams %}
+                    <tr>
+                        <td>{{ exam.title }}</td>
+                        <td>{{ class_name }}</td>
+                        <td>{{ exam.date.strftime('%Y-%m-%d') }}</td>
+                        <td>
+                            {% if exam.date >= now %}
+                                <span class="badge bg-success">Upcoming</span>
+                            {% else %}
+                                <span class="badge bg-danger">Completed</span>
+                            {% endif %}
+                        </td>
+                        <td>
+                            {% if exam.pdf_data %}
+
+                        <a href="{{ url_for('download_pdf', exam_id=exam.id) }}" class="btn btn-outline-secondary custom-btn" title="Download PDF">
+                            <i class="fas fa-download"></i>  <!-- Font Awesome Download Icon -->
+                        </a>
+                            {% else %}
+                                No File Attached
+                            {% endif %}
+                        </td>
+                        <td>
+                            <!-- Flexbox for Edit and Delete Buttons in the same column -->
+                            <div class="d-flex justify-content-between" style="width: 100px;">
+                                <!-- Edit Button with Pencil Icon -->
+                                <a href="{{ url_for('edit_exam', exam_id=exam.id) }}" class="btn btn-warning btn-sm" title="Edit Exam" style="padding: 5px 10px; font-size: 12px;">
+                                    <i class="fas fa-edit" style="font-size: 14px;"></i>  <!-- Font Awesome Pencil Icon -->
+                                </a>
+                                
+                                <!-- Spacer between Edit and Delete buttons -->
+
+                                <!-- Delete Button with Trash Icon -->
+                                <form action="{{ url_for('delete_exam', exam_id=exam.id) }}" method="POST" style="display:inline;">
+                                    <button type="submit" class="btn btn-danger btn-sm" title="Delete Exam" style="padding: 5px 10px; font-size: 12px;">
+                                        <i class="fas fa-trash-alt" style="font-size: 14px;"></i>  <!-- Font Awesome Trash Icon -->
+                                    </button>
+                                </form>
+                            </div>
+                        </td>
+                    </tr>
+                    {% else %}
+                    <tr>
+                        <td colspan="7" class="text-center">No exams available</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Create Exam Section -->
+        <div class="col-md-5">
+            <h1 class="mb-4">Create New Exam</h1>
+            <div class="card shadow-lg static-card">
+                <div class="card-body">
+                    <form method="POST" action="{{ url_for('exams') }}" enctype="multipart/form-data">
+                        <div class="mb-3">
+                            <label for="title" class="form-label">Exam Title</label>
+                            <input type="text" class="form-control" id="title" name="title" required>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="class_id" class="form-label">Select Class</label>
+                            <select class="form-select" id="class_id" name="class_id" required>
+                                <option value="">-- Select Class --</option>
+                                {% for cls in classes %}
+                                    <option value="{{ cls.id }}">{{ cls.name }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="date" class="form-label">Exam Date</label>
+                            <input type="date" class="form-control" id="date" name="date" required>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="pdf" class="form-label">Attach PDF (optional)</label>
+                            <input type="file" class="form-control" id="pdf" name="pdf" accept="application/pdf">
+                        </div>
+
+                        <button type="submit" class="btn btn-primary w-100">Create Exam</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
+<!-- Custom CSS to make form static and non-moving on hover -->
+<style>
+    .static-card {
+        transition: none !important;
+        transform: none !important;
+    }
+</style>
+{% endblock %}
+

@@ -1,0 +1,50 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<h2 class="mt-4">Students</h2>
+<div class="d-flex justify-content-between align-items-center mb-3">
+    <form method="GET" action="{{ url_for('students') }}" class="d-flex">
+        <div class="me-3">
+            <label for="class_id" class="form-label">Filter by Class:</label>
+            <select name="class_id" id="class_id" class="form-select">
+                <option value="">All Classes</option>
+                {% for class in classes %}
+                <option value="{{ class.id }}" {% if class.id|string == selected_class_id %}selected{% endif %}>
+                    {{ class.name }}
+                </option>
+                {% endfor %}
+            </select>
+        </div>
+        <div class="align-self-end">
+            <button type="submit" class="btn btn-primary">Filter</button>
+        </div>
+    </form>
+</div>
+
+<table class="table table-hover mt-3">
+    <thead>
+        <tr>
+            <th>Student Name</th>
+            <th>Class</th>
+            <th>Actions</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for student in students %}
+        <tr ondblclick="window.location.href='/student/{{ student.id }}'">
+            <td>{{ student.name }}</td>
+            <td>{{ student.class_.name }}</td>
+            <td>
+                
+
+                <form method="POST" action="{{ url_for('delete_student', student_id=student.id) }}" onsubmit="return confirm('Are you sure you want to delete this student?');" style="display:inline;">
+                    <button type="submit" class="btn btn-danger btn-sm" title="Delete Exam" style="padding: 5px 10px; font-size: 12px;">
+                        <i class="fas fa-trash-alt" style="font-size: 14px;"></i>  <!-- Font Awesome Trash Icon -->
+                    </button>
+                </form>
+            </td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+{% endblock %}

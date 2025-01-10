@@ -1,0 +1,53 @@
+{% extends 'base.html' %}
+{% block content %}
+
+
+<div class="container mt-5">
+    <h2 class="text-center mb-4">Manage Grind Subjects</h2>
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <form method="POST" action="{{ url_for('add_grind_subject') }}" class="card shadow p-4">
+                <h4 class="text-center mb-3">Add New Subject</h4>
+                <div class="mb-3">
+                    <label for="subject_name" class="form-label">Subject Name</label>
+                    <input type="text" id="subject_name" name="name" class="form-control" placeholder="Enter subject name" required>
+                </div>
+                <div class="d-grid gap-2">
+                    <button type="submit" class="btn btn-primary">Add Subject</button>
+                </div>
+            </form>
+        </div>
+    </div>
+    <div class="row justify-content-center mt-5">
+        <div class="col-md-10">
+            <table class="table table-hover table-bordered">
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Subject Name</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for subject in subjects %}
+                    <tr>
+                        <td>{{ subject.id }}</td>
+                        <td>{{ subject.name }}</td>
+                    </tr>
+                    {% else %}
+                    <tr>
+                        <td colspan="2" class="text-center">No subjects found.</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<style>
+    .static-card {
+        transition: none !important;
+        transform: none !important;
+    }
+</style>
+{% endblock %}

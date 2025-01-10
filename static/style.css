@@ -1,0 +1,231 @@
+/* General Reset */
+body, html {
+    margin: 0;
+    padding: 0;
+    font-family: 'Poppins', sans-serif;
+    background-color: #f3f4f6;  /* Light background */
+    color: #334155;
+    height: 100%;
+    overflow-x: hidden;
+}
+
+/* Sidebar (Glassmorphism with Light Theme and Neon Edge) */
+#sidebar-wrapper {
+    width: 270px;
+    height: 100vh;
+    position: fixed;
+    background: rgba(255, 255, 255, 0.9);
+    backdrop-filter: blur(30px);
+    -webkit-backdrop-filter: blur(30px);
+    border-right: 3px solid rgba(255, 105, 180, 0.1);
+    box-shadow: 10px 0 25px rgba(0, 0, 0, 0.05);
+    transition: all 0.5s ease;
+    z-index: 1000;
+}
+
+.sidebar-heading {
+    font-size: 2rem;
+    color: #ff00aa;
+    text-transform: uppercase;
+    letter-spacing: 2.5px;
+    margin-bottom: 30px;
+    text-align: center;
+    font-weight: 800;
+    text-shadow: 0 0 15px rgba(255, 0, 150, 0.3);
+}
+
+/* Sidebar Links */
+.list-group-item {
+    background-color: transparent;
+    color: #4b5563;
+    font-size: 1.1rem;
+    padding: 18px 30px;
+    border: none;
+    transition: all 0.4s ease;
+}
+
+.list-group-item:hover {
+    background: linear-gradient(135deg, #ff00ff 0%, #ff66b2 100%);
+    color: white;
+    font-weight: bold;
+    box-shadow: 0 8px 25px rgba(255, 105, 180, 0.15);
+    transform: translateX(10px);
+}
+
+.list-group-item.active {
+    background: #ff66b2;
+    color: white;
+    border-left: 5px solid #ff00ff;
+}
+
+/* Page Content */
+#page-content-wrapper {
+    margin-left: 270px;
+    padding: 60px;
+    transition: all 0.5s ease;
+}
+
+/* Cards (Soft Glow with Neon Edge) */
+.card {
+    border: none;
+    border-radius: 18px;
+    background: #ffffff;
+    box-shadow: 0 8px 30px rgba(0, 0, 0, 0.05);
+    transition: all 0.4s ease;
+    border: 1px solid rgba(255, 0, 255, 0.1);
+}
+
+.card:hover {
+    transform: translateY(-12px);
+    box-shadow: 0 15px 45px rgba(0, 0, 0, 0.1);
+    border: 1px solid rgba(255, 0, 255, 0.3);
+}
+
+/* Tables */
+.table {
+    margin-top: 30px;
+    border-radius: 12px;
+    overflow: hidden;
+    background-color: #ffffff;
+}
+
+.table th {
+    background-color: #ff66b2;
+    color: white;
+    padding: 18px;
+}
+
+.table td {
+    padding: 18px;
+}
+
+.table-striped tbody tr:nth-of-type(odd) {
+    background-color: #f9fafb;
+}
+
+.table-hover tbody tr:hover {
+    background-color: #e5e7eb;
+    transform: scale(1.01);
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+}
+
+/* Form Elements */
+.form-control {
+    border-radius: 12px;
+    border: 1px solid #cbd5e1;
+    background-color: white;
+    color: #334155;
+    transition: all 0.4s ease;
+}
+
+.form-control:focus {
+    border-color: #ff00aa;
+    box-shadow: 0 0 15px rgba(255, 0, 150, 0.3);
+}
+
+/* Buttons */
+.btn {
+    border-radius: 12px;
+    padding: 14px 28px;
+    font-size: 1rem;
+    transition: all 0.4s ease;
+}
+
+.btn-primary {
+    background: linear-gradient(135deg, #ff00ff 0%, #ff66b2 100%);
+    border: none;
+    color: white;
+    box-shadow: 0 8px 25px rgba(255, 105, 180, 0.2);
+}
+
+.btn-primary:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 12px 35px rgba(255, 105, 180, 0.3);
+}
+
+.btn-danger {
+    background: linear-gradient(135deg, #ff3e3e, #ff6f61);
+    border: none;
+    color: white;
+    box-shadow: 0 8px 25px rgba(255, 69, 69, 0.2);
+}
+
+.btn-danger:hover {
+    transform: translateY(-5px);
+}
+
+/* Headings */
+h1, h2, h3 {
+    color: #1e293b;
+    font-weight: 800;
+    text-transform: capitalize;
+}
+
+/* Flash Messages */
+.alert {
+    border-radius: 12px;
+    padding: 20px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.05);
+}
+
+.alert-success {
+    background-color: #bbf7d0;
+    color: #047857;
+}
+
+.alert-danger {
+    background-color: #fecaca;
+    color: #b91c1c;
+}
+
+.legend-dot {
+    display: inline-block;
+    width: 16px;
+    height: 16px;
+    border-radius: 50%;
+    margin-right: 5px;
+}
+
+
+
+/* Sidebar Responsive */
+@media (max-width: 992px) {
+    #sidebar-wrapper {
+        width: 100%;
+        height: auto;
+        position: relative;
+        box-shadow: none;
+    }
+
+    #page-content-wrapper {
+        margin-left: 0;
+        padding: 40px;
+    }
+
+    .list-group-item {
+        text-align: center;
+        padding: 18px;
+    }
+
+    .btn {
+        width: 100%;
+        margin-bottom: 10px;
+    }
+
+    #toggle-sidebar {
+        display: block;
+        text-align: center;
+        padding: 18px;
+        background-color: #ff66b2;
+        color: white;
+        font-weight: bold;
+    }
+
+    #sidebar-wrapper {
+        display: none;
+    }
+
+    #sidebar-wrapper.active {
+        display: block;
+    }
+}

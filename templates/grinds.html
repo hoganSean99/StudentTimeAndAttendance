@@ -1,0 +1,98 @@
+{% extends 'base.html' %}
+{% block content %}
+
+<style>
+    .static-card {
+        transition: none !important;
+        transform: none !important;
+    }
+    .grinds-table th, .grinds-table td {
+        text-align: center;
+        vertical-align: middle;
+    }
+    .grinds-header {
+        margin-top: 30px;
+    }
+</style>
+
+<div class="container mt-5">
+    <h2 class="text-center mb-4">Subjects Grinds</h2>
+    
+    <!-- Add Grinds Session Form -->
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <form method="POST" action="{{ url_for('add_grinds_session') }}" class="card shadow p-4 static-card">
+                <h4 class="text-center mb-3">Add New Grind Session</h4>
+                <div class="row mb-3">
+                    <div class="col-md-6">
+                        <label for="subject" class="form-label">Select Subject</label>
+                        <select class="form-select" id="subject" name="subject" required>
+                            <option value="" disabled selected>-- Select Subject --</option>
+                            {% for subject in subjects %}
+                            <option value="{{ subject.id }}">{{ subject.name }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div class="col-md-6">
+                        <label for="date" class="form-label">Date</label>
+                        <input type="date" id="date" name="date" class="form-control" required>
+                    </div>
+                </div>
+                <div class="row mb-3">
+                    <div class="col-md-6">
+                        <label for="time" class="form-label">Time</label>
+                        <input type="time" id="time" name="time" class="form-control" required>
+                    </div>
+                    <div class="col-md-6">
+                        <label for="location" class="form-label">Location</label>
+                        <input type="text" id="location" name="location" class="form-control" placeholder="e.g., Room 101" required>
+                    </div>
+                </div>
+                <div class="d-grid gap-2 mt-3">
+                    <button type="submit" class="btn btn-primary btn-lg">Add Session</button>
+                </div>
+            </form>
+        </div>
+    </div>
+    
+    <!-- Upcoming Grinds Sessions Table -->
+    <div class="grinds-header">
+        <h4 class="text-center mb-4">Upcoming Grinds Sessions</h4>
+        {% if sessions %}
+        <div class="row justify-content-center">
+            <div class="col-md-10">
+                <table class="table table-hover table-bordered grinds-table">
+                    <thead class="table-light">
+                        <tr>
+                            <th>Subject</th>
+                            <th>Date</th>
+                            <th>Time</th>
+                            <th>Location</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for session in sessions %}
+                        <tr>
+                            <td>{{ session.subject_name }}</td>
+                            <td>{{ session.date.strftime('%d-%m-%Y') }}</td>
+                            <td>{{ session.time }}</td>
+                            <td>{{ session.location }}</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        {% else %}
+        <p class="text-center mt-4">No upcoming grind sessions found.</p>
+        {% endif %}
+    </div>
+
+    <!-- Notes Section -->
+    <div class="mt-5">
+        <h4>Additional Notes for External Students</h4>
+        <p class="text-muted">Grind sessions are open to all students outside the school. Please register in advance. If you have any questions, feel free to contact us at <strong>info@schoolgrinds.com</strong>.</p>
+    </div>
+</div>
+
+{% endblock %}

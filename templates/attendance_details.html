@@ -1,0 +1,26 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container mt-5">
+    <h1 class="mb-4">Attendance</h1>
+    <h5 class="mb-4">Class: {{ class_name }}</h5>
+    <h5 class="mb-4">Date: {{ date }}</h5>
+    
+    <table class="table table-bordered">
+        <thead>
+            <tr>
+                <th>Student Name</th>
+                <th>Status</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for record, student, class_name in attendance_records %}
+            <tr class="{% if record.status == 'A' %}table-danger{% elif record.status == 'P' %}table-success{% elif record.status == 'L' %}table-warning{% endif %}">
+                <td>{{ student.name }}</td>
+                <td>{{ record.status if record.status else 'N/A' }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endblock %}

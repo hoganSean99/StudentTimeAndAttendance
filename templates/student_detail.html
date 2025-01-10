@@ -1,0 +1,101 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<h2 class="mt-4">{{ student.name }}'s Details</h2>
+
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <div>
+        <h5>Class: {{ student.class_.name }}</h5>
+    </div>
+    <a href="{{ url_for('export_student_pdf', student_id=student.id) }}" class="btn btn-success">Export as PDF</a>
+</div>
+
+<div class="row">
+    <div class="col-md-6">
+        <h3>Attendance Overview</h3>
+        {% if chart_url %}
+        <img src="data:image/png;base64,{{ chart_url }}" class="img-fluid" alt="Attendance Chart">
+        {% else %}
+        <p>No attendance records available.</p>
+        {% endif %}
+    </div>
+    <div class="col-md-6">
+        <h3>Performance Graph</h3>
+        {% if plot_url %}
+        <img src="data:image/png;base64,{{ plot_url }}" class="img-fluid" alt="Performance Graph">
+        {% else %}
+        <p>No exam records available.</p>
+        {% endif %}
+    </div>
+</div>
+
+<h3 class="mt-5">Exam Results</h3>
+<table class="table table-hover">
+    <thead>
+        <tr>
+            <th>Exam Title</th>
+            <th>Date</th>
+            <th>Score (%)</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for result in exam_results %}
+        <tr>
+            <td>{{ result.exam.title }}</td>
+            <td>{{ result.exam.date.strftime('%Y-%m-%d') }}</td>
+            <td>{{ result.score }}</td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+
+{% if available_exams %}
+<h3 class="mt-5">Record Exam Score</h3>
+<form method="POST" action="{{ url_for('record_exam', student_id=student.id) }}">
+    <div class="mb-3">
+        <label for="exam_id" class="form-label">Select Exam</label>
+        <select name="exam_id" id="exam_id" class="form-select">
+            {% for exam in available_exams %}
+            <option value="{{ exam.id }}">{{ exam.title }} - {{ exam.date.strftime('%Y-%m-%d') }}</option>
+            {% endfor %}
+        </select>
+    </div>
+    <div class="mb-3">
+        <label for="score" class="form-label">Score (%)</label>
+        <input type="number" class="form-control" name="score" id="score" required min="0" max="100">
+    </div>
+    <button type="submit" class="btn btn-primary">Submit Score</button>
+</form>
+{% endif %}
+
+<h3 class="mt-5">Homework Records</h3>
+<table class="table table-hover">
+    <thead>
+        <tr>
+            <th>Date Assigned</th>
+            <th>Completed</th>
+            <th>Comments</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for record in homework_records %}
+        <tr>
+            <td>{{ record.date_assigned.strftime('%Y-%m-%d') }}</td>
+            <td>
+                {% if record.completed %}
+                    <span class="text-success">Yes</span>
+                {% else %}
+                    <span class="text-danger">No</span>
+                {% endif %}
+            </td>
+            <td>{{ record.comments or 'No comments' }}</td>
+        </tr>
+        {% else %}
+        <tr>
+            <td colspan="3" class="text-center">No homework records available</td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+
+{% endblock %}

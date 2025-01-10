@@ -1,0 +1,52 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container mt-5">
+    <div class="row">
+        <!-- Edit Exam Section -->
+        <div class="col-md-8">
+            <h1 class="mb-4">Edit Exam</h1>
+            <div class="card shadow-lg static-card">
+                <div class="card-body">
+                    <form method="POST" action="{{ url_for('edit_exam', exam_id=exam.id) }}" enctype="multipart/form-data">
+                        <div class="mb-3">
+                            <label for="title" class="form-label">Exam Title</label>
+                            <input type="text" class="form-control" id="title" name="title" value="{{ exam.title }}" required>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="class_id" class="form-label">Select Class</label>
+                            <select class="form-select" id="class_id" name="class_id" required>
+                                {% for cls in classes %}
+                                    <option value="{{ cls.id }}" {% if cls.id == exam.class_id %} selected {% endif %}>{{ cls.name }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="date" class="form-label">Exam Date</label>
+                            <input type="date" class="form-control" id="date" name="date" value="{{ exam.date.strftime('%Y-%m-%d') }}" required>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="pdf" class="form-label">Attach PDF (optional)</label>
+                            <input type="file" class="form-control" id="pdf" name="pdf" accept="application/pdf">
+                            <small class="form-text text-muted">Leave empty if you don't want to change the PDF.</small>
+                        </div>
+
+                        <button type="submit" class="btn btn-primary w-100">Update Exam</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Custom CSS to make form static and non-moving on hover -->
+<style>
+    .static-card {
+        transition: none !important;
+        transform: none !important;
+    }
+</style>
+{% endblock %}

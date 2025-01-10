@@ -1,0 +1,74 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container mt-5">
+    <div class="row">
+        <!-- Exam List Section -->
+        <div class="col-md-7">
+            <h1 class="mb-4">All Exams</h1>
+            <table class="table table-hover table-bordered shadow-sm">
+                <thead class="table-dark">
+                    <tr>
+                        <th>Exam Title</th>
+                        <th>Class</th>
+                        <th>Exam Date</th>
+                        <th>Status</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for exam, class_name in exams %}
+                    <tr>
+                        <td>{{ exam.title }}</td>
+                        <td>{{ class_name }}</td>
+                        <td>{{ exam.date.strftime('%Y-%m-%d') }}</td>
+                        <td>
+                            {% if exam.date >= now %}
+                                <span class="badge bg-success">Upcoming</span>
+                            {% else %}
+                                <span class="badge bg-danger">Completed</span>
+                            {% endif %}
+                        </td>
+                    </tr>
+                    {% else %}
+                    <tr>
+                        <td colspan="4" class="text-center">No exams available</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Create Exam Section -->
+        <div class="col-md-5">
+            <div class="card shadow-lg">
+                <div class="card-body">
+                    <h2 class="card-title mb-4">Create New Exam</h2>
+                    <form method="POST" action="{{ url_for('add_exam') }}">
+                        <div class="mb-3">
+                            <label for="title" class="form-label">Exam Title</label>
+                            <input type="text" class="form-control" id="title" name="title" required>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="class_id" class="form-label">Select Class</label>
+                            <select class="form-select" id="class_id" name="class_id" required>
+                                <option value="">-- Select Class --</option>
+                                {% for cls in classes %}
+                                    <option value="{{ cls.id }}">{{ cls.name }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="date" class="form-label">Exam Date</label>
+                            <input type="date" class="form-control" id="date" name="date" required>
+                        </div>
+
+                        <button type="submit" class="btn btn-primary w-100">Create Exam</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

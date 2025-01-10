@@ -1,0 +1,124 @@
+{% extends 'base.html' %}
+
+{% block content %}
+
+<style>
+    .static-card {
+        transition: none !important;
+        transform: none !important;
+    }
+    .present {
+        background-color: #d4edda !important;  /* Light green for Present */
+    }
+    .absent {
+        background-color: #f8d7da !important;  /* Light red for Absent */
+    }
+    .late {
+        background-color: #fff3cd !important;  /* Light yellow for Late */
+    }
+    .date-picker-container {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 15px;
+    }
+    .date-picker-container label {
+        margin-right: 10px;
+        font-weight: 500;
+    }
+    .date-input {
+        border: 1px solid #ced4da;
+        border-radius: 5px;
+        padding: 6px 10px;
+    }
+</style>
+
+<div class="container mt-5">
+    <h2 class="text-center mb-4">Take Attendance</h2>
+
+    <!-- Class and Date Selection Form -->
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <form method="GET" action="{{ url_for('attendance') }}" class="card shadow p-4 static-card">
+                <div class="row mb-4">
+                    <div class="col-md-8">
+                        <label for="class_id" class="form-label">Select Class</label>
+                        <select class="form-select" id="class_id" name="class_id" onchange="this.form.submit()" required>
+                            <option value="" disabled {% if not selected_class_id %}selected{% endif %}>-- Select Class --</option>
+                            {% for cls in classes %}
+                            <option value="{{ cls.id }}" {% if cls.id == class_id|int %}selected{% endif %}>
+                                {{ cls.name }}
+                            </option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div class="col-md-4">
+                        <label for="attendance_date" class="form-label">Select Date</label>
+                        <input type="date" id="attendance_date" name="attendance_date" class="form-control date-input"
+                               value="{{ selected_date or '' }}" onchange="this.form.submit()" required>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    {% if students %}
+    <div class="row justify-content-center mt-5">
+        <div class="col-md-10">
+            <form method="POST" action="/save_attendance" class="card shadow p-4 static-card">
+                <input type="hidden" name="class_id" value="{{ class_id }}">
+                <input type="hidden" name="attendance_date" value="{{ selected_date }}">
+
+                <h4 class="text-center mb-4">Record Attendance</h4>
+
+                <table class="table table-hover table-bordered">
+                    <thead class="table-light">
+                        <tr>
+                            <th>Student Name</th>
+                            <th class="text-center">Attendance Status</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for student in students %}
+                        <tr class="
+                            {% if attendance_records.get(student.id) == 'P' %}present
+                            {% elif attendance_records.get(student.id) == 'A' %}absent
+                            {% elif attendance_records.get(student.id) == 'L' %}late
+                            {% endif %}">
+                            <td>{{ student.name }}</td>
+                            <td class="text-center">
+                                <select name="{{ student.id }}" class="form-select">
+                                    <option value="P" {% if attendance_records.get(student.id) == 'P' %}selected{% endif %}>Present</option>
+                                    <option value="A" {% if attendance_records.get(student.id) == 'A' %}selected{% endif %}>Absent</option>
+                                    <option value="L" {% if attendance_records.get(student.id) == 'L' %}selected{% endif %}>Late</option>
+                                </select>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+
+                <div class="d-grid gap-2 mt-4">
+                    <button type="submit" class="btn btn-primary btn-lg">Save Attendance</button>
+                </div>
+            </form>
+        </div>
+    </div>
+    {% else %}
+    <p class="text-center mt-4">No students found for this class.</p>
+    {% endif %}
+</div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        const today = new Date().toISOString().split('T')[0];
+        const datePicker = document.getElementById('attendance_date');
+
+        // Prepopulate the date picker with today's date if empty
+        if (!datePicker.value) {
+            datePicker.value = today;
+        }
+    });
+</script>
+
+{% endblock %}

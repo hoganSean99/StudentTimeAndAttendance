@@ -1,0 +1,120 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container mt-5">
+    <div class="text-center mb-5">
+        <h1>Student Attendance and Progress System</h1>
+    </div>
+
+    <!-- Statistics Section -->
+    <div class="row text-center">
+        <div class="col-md-3">
+            <div class="card shadow-lg">
+                <div class="card-body">
+                    <h2>{{ total_students }}</h2>
+                    <p>Total Students</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-3">
+            <div class="card shadow-lg">
+                <div class="card-body">
+                    <h2>{{ total_classes }}</h2>
+                    <p>Total Classes</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-3">
+            <div class="card shadow-lg">
+                <div class="card-body">
+                    <h2>{{ latest_exams|length }}</h2>
+                    <p>Upcoming Exams</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-3">
+            <div class="card shadow-lg">
+                <div class="card-body">
+                    <h2>{{ attendance_summary|length }}</h2>
+                    <p>Weekly Absences</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Recent Exams Section -->
+    <div class="mt-5">
+        <h2>Upcoming Exams</h2>
+        <table class="table table-hover">
+            <thead>
+                <tr>
+                    <th>Exam Title</th>
+                    <th>Class</th>
+                    <th>Date</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for row in latest_exams %}
+                <tr>
+                    <td>{{ row[0].title }}</td>  <!-- Exam title -->
+                    <td>{{ row.class_name }}</td>  <!-- Class name from join -->
+                    <td>{{ row[0].date.strftime('%Y-%m-%d') }}</td>  <!-- Exam date -->
+                </tr>
+                {% else %}
+                <tr>
+                    <td colspan="3" class="text-center">No upcoming exams</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+    <!-- Recent Attendance Section -->
+    <div class="mt-5">
+        <h2>Absences this Week</h2>
+        <table class="table table-hover">
+            <thead>
+                <tr>
+                    <th>Student</th>
+                    <th>Date</th>
+                    <th>Status</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for record, student_name in attendance_summary %}
+                <tr>
+                    <td>{{ student_name }}</td>  <!-- Access joined student name -->
+                    <td>{{ record.date.strftime('%Y-%m-%d') }}</td>  <!-- Attendance date -->
+                    <td>
+                        {% if record.status == 'P' %}
+                        <span class="text-success">Present</span>
+                        {% elif record.status == 'A' %}
+                        <span class="text-danger">Absent</span>
+                        {% else %}
+                        <span class="text-warning">Late</span>
+                        {% endif %}
+                    </td>
+                </tr>
+                {% else %}
+                <tr>
+                    <td colspan="3" class="text-center">No Absences this week.......yet!</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+    <!-- Quick Links Section -->
+    <div class="text-center mt-5">
+        <h2>Quick Actions</h2>
+        <div class="d-flex justify-content-center gap-4 mt-4">
+            <a href="{{ url_for('students') }}" class="btn btn-primary btn-lg">Manage Students</a>
+            <a href="{{ url_for('classes') }}" class="btn btn-secondary btn-lg">View Classes</a>
+            <a href="{{ url_for('add_class') }}" class="btn btn-success btn-lg">Add New Class</a>
+        </div>
+    </div>
+</div>
+{% endblock %}

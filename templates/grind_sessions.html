@@ -1,0 +1,209 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<style>
+    .static-card {
+        transition: none !important;
+        transform: none !important;
+    }
+</style>
+
+<div class="container mt-5">
+    <h2 class="text-center mb-4">Manage Grinds Sessions</h2>
+    
+    <!-- Form to Add Grinds Session -->
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <form method="POST" action="{{ url_for('add_grinds_session') }}" class="card shadow p-4 static-card">
+                <div class="mb-3">
+                    <label for="subject_id" class="form-label">Select Subject</label>
+                    <select class="form-select" id="subject_id" name="subject_id" required>
+                        <option value="" disabled selected>-- Select Subject --</option>
+                        {% for subject in subjects %}
+                        <option value="{{ subject.id }}">{{ subject.name }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="mb-3">
+                    <label for="session_date" class="form-label">Session Date</label>
+                    <input type="date" id="session_date" name="session_date" class="form-control" required>
+                </div>
+                <div class="mb-3">
+                    <label for="session_time" class="form-label">Session Time</label>
+                    <input type="time" id="session_time" name="time" class="form-control" required>
+                </div>
+                
+                <div class="mb-3">
+                    <label for="price" class="form-label">Price</label>
+                    <input type="number" id="price" name="price" class="form-control" step="0.01" placeholder="Enter price in USD" required>
+                </div>
+                <div class="mb-3">
+                    <label for="students" class="form-label">Add Students</label>
+                    <textarea id="students" name="students" class="form-control" placeholder="Enter student names, one per line"></textarea>
+                </div>
+                <div class="d-grid gap-2">
+                    <button type="submit" class="btn btn-primary btn-lg">Add Grinds Session</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Display Existing Grinds Sessions -->
+    <div class="row justify-content-center mt-5">
+        <div class="col-md-10">
+            <div class="card shadow p-4 static-card">
+                <h4 class="text-center mb-4">Existing Grinds Sessions</h4>
+                {% if sessions %}
+                <table class="table table-hover table-bordered">
+                    <thead class="table-light">
+                        <tr>
+                            <th>Subject</th>
+                            <th>Session Date</th>
+                            <th>Price</th>
+                            <th>Students</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for session in sessions %}
+                        <tr>
+                            <td>{{ session.subject.name }}</td>
+                            <td>{{ session.date.strftime('%Y-%m-%d') }}</td>
+                            <td>${{ session.price }}</td>
+                            <td>
+                                <ul>
+                                    {% for student in session.students %}
+                                    <li>{{ student.name }}</li>
+                                    {% endfor %}
+                                </ul>
+                            </td>
+                            <td class="text-center">
+                                <div class="d-flex justify-content-center align-items-center gap-2">
+                                    <!-- Edit Button -->
+                                    <button 
+                                    class="btn btn-warning btn-sm edit-session-btn p-1"
+                                    data-session-id="{{ session.id }}"
+                                    data-subject-id="{{ session.subject.id }}"
+                                    data-session-date="{{ session.date.strftime('%Y-%m-%d') }}"
+                                    data-session-time="{{ session.time }}"
+                                    data-price="{{ session.price }}"
+                                    data-students="{{ session.students | map(attribute='name') | join(', ') }}"
+                                    title="Edit Session"
+                                    style="width: 30px; height: 30px; display: flex; justify-content: center; align-items: center;">
+                                    <i class="fas fa-edit" style="font-size: 14px;"></i>
+                                </button>
+                            
+                                    <!-- Delete Button -->
+                                    <form action="{{ url_for('delete_grinds_session', session_id=session.id) }}" method="POST" style="margin: 0;">
+                                        <button 
+                                            type="submit" 
+                                            class="btn btn-danger btn-sm"
+                                            title="Delete Session"
+                                            style="display: flex; justify-content: center; align-items: center; padding: 5px; width: 36px; height: 36px;"
+                                        >
+                                            <i class="fas fa-trash-alt" style="font-size: 14px;"></i>
+                                        </button>
+                                    </form>
+                                </div>
+                            </td>
+                            
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+                {% else %}
+                <p class="text-center">No grinds sessions found. Add a new session above.</p>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal for Editing Grinds Session -->
+<div class="modal fade" id="editGrindsSessionModal" tabindex="-1" aria-labelledby="editGrindsSessionModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <form id="editGrindsSessionForm" method="POST" action="{{ url_for('edit_grinds_session') }}">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="editGrindsSessionModalLabel">Edit Grinds Session</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <input type="hidden" id="editSessionId" name="session_id">
+                    
+                    <!-- Subject -->
+                    <div class="mb-3">
+                        <label for="editSubjectId" class="form-label">Subject</label>
+                        <select class="form-select" id="editSubjectId" name="subject_id" required>
+                            {% for subject in subjects %}
+                            <option value="{{ subject.id }}">{{ subject.name }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    
+                    <!-- Date -->
+                    <div class="mb-3">
+                        <label for="editSessionDate" class="form-label">Date</label>
+                        <input type="date" id="editSessionDate" name="session_date" class="form-control" required>
+                    </div>
+                    
+                    <!-- Time -->
+                    <div class="mb-3">
+                        <label for="editSessionTime" class="form-label">Time</label>
+                        <input type="time" id="editSessionTime" name="session_time" class="form-control" required>
+                    </div>
+                    
+                    <!-- Price -->
+                    <div class="mb-3">
+                        <label for="editPrice" class="form-label">Price</label>
+                        <input type="number" id="editPrice" name="price" class="form-control" step="0.01" required>
+                    </div>
+                    
+                    <!-- Students -->
+                    <div class="mb-3">
+                        <label for="editStudents" class="form-label">Students</label>
+                        <textarea id="editStudents" name="students" class="form-control" placeholder="Enter student names, one per line"></textarea>
+                        <small class="text-muted">Current students will be replaced by the updated list.</small>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                    <button type="submit" class="btn btn-primary">Save Changes</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        const editSessionButtons = document.querySelectorAll('.edit-session-btn');
+        const editModal = document.getElementById('editGrindsSessionModal');
+        
+        editSessionButtons.forEach(button => {
+            button.addEventListener('click', function () {
+                const sessionId = this.dataset.sessionId;
+                const subjectId = this.dataset.subjectId;
+                const sessionDate = this.dataset.sessionDate;
+                const sessionTime = this.dataset.sessionTime;
+                const price = this.dataset.price;
+                const students = this.dataset.students;
+    
+                // Populate modal fields
+                document.getElementById('editSessionId').value = sessionId;
+                document.getElementById('editSubjectId').value = subjectId;
+                document.getElementById('editSessionDate').value = sessionDate;
+                document.getElementById('editSessionTime').value = sessionTime;
+                document.getElementById('editPrice').value = price;
+                document.getElementById('editStudents').value = students.split(', ').join('\n');
+    
+                // Show the modal
+                const bootstrapModal = new bootstrap.Modal(editModal);
+                bootstrapModal.show();
+            });
+        });
+    });
+    
+</script>
+
+{% endblock %}

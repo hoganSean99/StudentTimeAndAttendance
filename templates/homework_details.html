@@ -1,0 +1,28 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container mt-5">
+    <h1 class="mb-4">Homework</h1>
+    <h5 class="mb-4">Class: {{ class_name }}</h5>
+    <h5 class="mb-4">Date: {{ date }}</h5>
+    
+    <table class="table table-bordered">
+        <thead>
+            <tr>
+                <th>Student Name</th>
+                <th>Completed</th>
+                <th>Comments</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for homework, student in homework_records %}
+            <tr class="{% if homework.completed %}table-success{% else %}table-danger{% endif %}">
+                <td>{{ student.name }}</td>
+                <td>{{ 'Yes' if homework.completed else 'No' }}</td>
+                <td>{{ homework.comments if homework.comments else 'No comments' }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endblock %}
