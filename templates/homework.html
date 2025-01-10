@@ -1,7 +1,6 @@
 {% extends 'base.html' %}
-{% block content %}
 
-<!-- Custom CSS to make form static and non-moving on hover -->
+{% block content %}
 <style>
     .static-card {
         transition: none !important;
@@ -19,40 +18,20 @@
         align-items: center;
         margin-bottom: 15px;
     }
-    .date-picker-container label {
-        margin-right: 10px;
-        font-weight: 500;
-    }
-    .date-input {
-        border: 1px solid #ced4da;
-        border-radius: 5px;
-        padding: 6px 10px;
-    }
-    .date-icon {
-        background: none;
-        border: none;
-        cursor: pointer;
-        font-size: 1.4rem;
-        color: #495057;
-        margin-left: 8px;
-    }
-    .date-icon:hover {
-        color: #007bff;
-    }
 </style>
 
 <div class="container mt-5">
     <h2 class="text-center mb-4">Record Homework</h2>
-
-    <!-- Class Selection Form -->
+    
+    <!-- Class and Date Selection Form -->
     <div class="row justify-content-center">
         <div class="col-md-8">
             <form method="GET" action="{{ url_for('homework') }}" class="card shadow p-4 static-card">
-                <div class="row mb-4">
-                    <div class="col-md-8">
+                <div class="mb-4 d-flex align-items-center">
+                    <div class="me-3">
                         <label for="class_id" class="form-label">Select Class</label>
                         <select class="form-select" id="class_id" name="class_id" onchange="this.form.submit()" required>
-                            <option value="" disabled selected>-- Select Class --</option>
+                            <option value="" disabled {% if not selected_class_id %}selected{% endif %}>-- Select Class --</option>
                             {% for cls in classes %}
                             <option value="{{ cls.id }}" {% if cls.id == selected_class_id|int %}selected{% endif %}>
                                 {{ cls.name }}
@@ -60,9 +39,10 @@
                             {% endfor %}
                         </select>
                     </div>
-                    <div class="col-md-4">
+                    <div>
                         <label for="homework_date" class="form-label">Select Date</label>
-                        <input type="date" id="homework_date" name="homework_date" class="form-control date-input" value="{{ selected_date or '' }}" onchange="this.form.submit()" required>
+                        <input type="date" id="homework_date" name="homework_date" class="form-control date-input" 
+                               value="{{ selected_date }}" onchange="this.form.submit()" required>
                     </div>
                 </div>
             </form>
@@ -70,6 +50,7 @@
     </div>
 
     {% if students %}
+    <!-- Homework Records Form -->
     <div class="row justify-content-center mt-5">
         <div class="col-md-10">
             <form method="POST" action="{{ url_for('homework', class_id=selected_class_id) }}" class="card shadow p-4 static-card">
@@ -85,16 +66,17 @@
                     </thead>
                     <tbody>
                         {% for student in students %}
-                        <tr class="{% if student.id in homework_done %}recorded{% else %}not-recorded{% endif %}">
+                        <tr class="{% if homework_done.get(student.id, {}).completed %}recorded{% else %}not-recorded{% endif %}">
                             <td>{{ student.name }}</td>
                             <td class="text-center">
                                 <select name="completed_{{ student.id }}" class="form-select">
-                                    <option value="on" {% if homework_done.get(student.id) == True %}selected{% endif %}>Yes</option>
-                                    <option value="" {% if homework_done.get(student.id) == False %}selected{% endif %}>No</option>
+                                    <option value="on" {% if homework_done.get(student.id, {}).completed or homework_done.get(student.id) is none %}selected{% endif %}>Yes</option>
+                                    <option value="" {% if homework_done.get(student.id) and not homework_done.get(student.id).completed %}selected{% endif %}>No</option>
                                 </select>
                             </td>
                             <td>
-                                <input type="text" class="form-control" name="comment_{{ student.id }}" value="{{ homework_comments.get(student.id, '') }}" placeholder="Add comments">
+                                <input type="text" class="form-control" name="comment_{{ student.id }}" 
+                                       value="{{ homework_done.get(student.id, {}).comments }}" placeholder="Add comments">
                             </td>
                         </tr>
                         {% endfor %}
@@ -107,7 +89,7 @@
         </div>
     </div>
     {% else %}
-    <p class="text-center mt-4">No students found for this class.</p>
+    <p class="text-center mt-5">No students found for this class.</p>
     {% endif %}
 </div>
 

@@ -686,44 +686,52 @@ from datetime import datetime
 @app.route('/homework', methods=['GET', 'POST'])
 def homework():
     class_id = request.args.get('class_id')
-    selected_date = request.args.get('homework_date') or datetime.now().date().strftime('%Y-%m-%d')
+    homework_date = request.args.get('homework_date') or datetime.now().strftime('%Y-%m-%d')
     all_classes = Class.query.all()
     students = []
     homework_done = {}
-    homework_comments = {}
 
     if class_id:
-        # Fetch students and homework records
+        class_id = int(class_id)
         students = Student.query.filter_by(class_id=class_id).all()
-        completed_homework = Homework.query.filter(
-            Homework.student_id.in_([student.id for student in students]),
-            Homework.date_assigned == datetime.strptime(selected_date, '%Y-%m-%d').date()
+
+        # Parse the selected date
+        date_object = datetime.strptime(homework_date, '%Y-%m-%d').date()
+
+        # Fetch homework records for the selected date and class
+        homework_records = db.session.query(Homework).join(Student).filter(
+            Student.class_id == class_id,
+            Homework.date_assigned == date_object
         ).all()
 
-        # Map completed homework and comments
-        homework_done = {hw.student_id: hw.completed for hw in completed_homework}
-        homework_comments = {hw.student_id: hw.comments for hw in completed_homework}
+        # Create a dictionary of homework details
+        homework_done = {
+            hw.student_id: {'completed': hw.completed, 'comments': hw.comments or ''}
+            for hw in homework_records
+        }
 
     if request.method == 'POST':
+        # Parse the date from the form submission
+        homework_date = request.form.get('homework_date')
+        date_object = datetime.strptime(homework_date, '%Y-%m-%d').date()
+
+        # Handle saving homework records
         for student in students:
             completed = request.form.get(f'completed_{student.id}') == 'on'
             comment = request.form.get(f'comment_{student.id}', '')
 
-            # Check if homework exists
+            # Check if a record already exists
             existing_homework = Homework.query.filter_by(
-                student_id=student.id,
-                date_assigned=datetime.strptime(selected_date, '%Y-%m-%d').date()
+                student_id=student.id, date_assigned=date_object
             ).first()
 
             if existing_homework:
-                # Update existing record
                 existing_homework.completed = completed
                 existing_homework.comments = comment
             else:
-                # Add new record
                 new_homework = Homework(
                     student_id=student.id,
-                    date_assigned=datetime.strptime(selected_date, '%Y-%m-%d').date(),
+                    date_assigned=date_object,
                     completed=completed,
                     comments=comment
                 )
@@ -731,17 +739,19 @@ def homework():
 
         db.session.commit()
         flash('Homework records updated successfully!', 'success')
-        return redirect(url_for('homework', class_id=class_id, homework_date=selected_date))
+        return redirect(url_for('homework', class_id=class_id, homework_date=homework_date))
 
     return render_template(
         'homework.html',
         students=students,
         classes=all_classes,
         selected_class_id=class_id,
-        selected_date=selected_date,
-        homework_done=homework_done,
-        homework_comments=homework_comments
+        selected_date=homework_date,
+        homework_done=homework_done
     )
+
+
+
 
 @app.route('/homework_details/<int:class_id>/<date>')
 def homework_details(class_id, date):
